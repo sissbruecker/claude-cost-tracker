@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Cost Tracker</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7;
+    --surface: #fcfcfb;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11, 11, 11, 0.1);
+    --series-flow-components: #2a78d6;
+    --series-web-components: #eb6834;
+    --series-flow: #1baf7a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page: #0d0d0d;
+      --surface: #1a1a19;
+      --text-primary: #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted: #898781;
+      --grid: #2c2c2a;
+      --baseline: #383835;
+      --border: rgba(255, 255, 255, 0.1);
+      --series-flow-components: #3987e5;
+      --series-web-components: #d95926;
+      --series-flow: #199e70;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page);
+    color: var(--text-primary);
+    font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 24px 64px; }
+  header h1 { font-size: 22px; font-weight: 650; margin: 0 0 4px; }
+  header p { margin: 0; color: var(--text-secondary); }
+  header .updated { color: var(--text-muted); font-size: 12px; margin-top: 4px; }
+
+  .filters {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+    margin: 24px 0 20px;
+  }
+  .filters label { color: var(--text-secondary); font-size: 13px; display: flex; align-items: center; gap: 6px; }
+  .filters select {
+    font: inherit; color: var(--text-primary);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 6px 8px;
+  }
+  .seg { display: inline-flex; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 2px; }
+  .seg button {
+    font: inherit; font-size: 13px; color: var(--text-secondary);
+    background: none; border: 0; border-radius: 6px; padding: 4px 12px; cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--page); color: var(--text-primary); font-weight: 600; box-shadow: inset 0 0 0 1px var(--border); }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .tile {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .tile .label { color: var(--text-secondary); font-size: 12px; }
+  .tile .value { font-size: 24px; font-weight: 650; margin-top: 2px; }
+  .tile .sub { color: var(--text-muted); font-size: 12px; margin-top: 2px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 18px 12px; margin-bottom: 20px;
+  }
+  .card h2 { font-size: 14px; font-weight: 600; margin: 0; }
+  .card .subtitle { color: var(--text-muted); font-size: 12px; margin: 2px 0 0; }
+  .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--text-secondary); flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .chart-box { position: relative; height: 300px; margin-top: 12px; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: var(--text-muted); font-weight: 500; font-size: 12px; padding: 8px 10px; border-bottom: 1px solid var(--grid); }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--grid); }
+  tr:last-child td { border-bottom: 0; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td a { color: var(--text-primary); text-decoration: none; }
+  td a:hover { text-decoration: underline; }
+  .repo-key { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .repo-key i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; flex: none; }
+  .muted { color: var(--text-muted); }
+  .title-cell { max-width: min(420px, 34vw); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  details.card summary { cursor: pointer; font-size: 14px; font-weight: 600; padding-bottom: 6px; }
+  .scroll-x { overflow-x: auto; }
+  footer { color: var(--text-muted); font-size: 12px; }
+  #error { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; color: var(--text-secondary); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Claude Cost Tracker</h1>
+    <p>Costs of Claude Code workflow runs across Vaadin repositories</p>
+    <p class="updated" id="updated"></p>
+  </header>
+
+  <div id="error"></div>
+
+  <div id="app" hidden>
+    <div class="filters">
+      <label>Repository
+        <select id="repoFilter"></select>
+      </label>
+      <label>Workflow
+        <select id="workflowFilter">
+          <option value="">All workflows</option>
+        </select>
+      </label>
+      <label>Range
+        <select id="rangeFilter">
+          <option value="30" selected>Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="all">All time</option>
+        </select>
+      </label>
+      <div class="seg" id="granularity" role="group" aria-label="Granularity">
+        <button data-value="week" aria-pressed="true">Weekly</button>
+        <button data-value="month" aria-pressed="false">Monthly</button>
+      </div>
+    </div>
+
+    <div class="tiles" id="tiles"></div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2 id="costChartTitle">Total cost per week</h2>
+          <p class="subtitle">USD, stacked by repository</p>
+        </div>
+        <div class="legend" id="costLegend"></div>
+      </div>
+      <div class="chart-box"><canvas id="costChart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2 id="avgChartTitle">Average cost per run</h2>
+          <p class="subtitle">USD per run, by repository</p>
+        </div>
+        <div class="legend" id="avgLegend"></div>
+      </div>
+      <div class="chart-box"><canvas id="avgChart"></canvas></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Most expensive runs</h2>
+          <p class="subtitle">Top 10 in the selected range</p>
+        </div>
+      </div>
+      <div class="scroll-x">
+        <table id="topRuns">
+          <thead>
+            <tr><th>Date</th><th>Repository</th><th>Workflow</th><th>Run</th><th class="num">Duration</th><th class="num">Cost</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
+    <details class="card">
+      <summary>Data table</summary>
+      <div class="scroll-x">
+        <table id="dataTable">
+          <thead>
+            <tr><th>Period</th><th>Repository</th><th class="num">Runs</th><th class="num">Total</th><th class="num">Average</th><th class="num">Median</th><th class="num">p90</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </details>
+
+    <footer>
+      Costs are extracted from workflow job logs. Code-review costs are rounded to cents in the logs;
+      comment-triggered runs report exact values. Data updates daily via a scheduled workflow.
+    </footer>
+  </div>
+</div>
+<script src="vendor/chart.umd.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

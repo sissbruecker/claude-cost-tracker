@@ -1,0 +1,14 @@
+{
+  "name": "claude-cost-tracker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Collects and visualizes costs of Claude Code GitHub workflow runs across Vaadin repos",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "collect": "node scripts/collect.js",
+    "serve": "npx serve docs"
+  }
+}
