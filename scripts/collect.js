@@ -4,7 +4,8 @@
  * For each configured (repo, workflow) pair, lists workflow runs, downloads the
  * logs of the job that ran Claude, and extracts the cost:
  *   - `"total_cost_usd": 1.234` — result JSON logged by claude-code-action (precise)
- *   - `... ($1.23).` — summary line logged by the code-review workflow (rounded)
+ *   - `... ($1.23).` — summary line logged by the code-review and pr-presentation
+ *     workflows (rounded)
  *
  * Records are appended to one NDJSON file per repo in the data dir, deduplicated
  * by run id. Incremental by default (re-scans a small overlap window); use

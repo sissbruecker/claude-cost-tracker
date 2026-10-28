@@ -2,8 +2,8 @@
   "dataDir": "docs/data",
   "defaultBackfillDays": 90,
   "sources": [
-    { "repo": "vaadin/flow-components", "workflows": ["claude.yml", "code-review.yml"] },
-    { "repo": "vaadin/web-components", "workflows": ["claude.yml", "code-review.yml"] },
-    { "repo": "vaadin/flow", "workflows": ["claude.yml", "code-review.yml"] }
+    { "repo": "vaadin/flow-components", "workflows": ["claude.yml", "code-review.yml", "pr-presentation.yml"] },
+    { "repo": "vaadin/web-components", "workflows": ["claude.yml", "code-review.yml", "pr-presentation.yml"] },
+    { "repo": "vaadin/flow", "workflows": ["claude.yml", "code-review.yml", "pr-presentation.yml"] }
   ]
 }

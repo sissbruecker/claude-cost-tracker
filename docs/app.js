@@ -6,8 +6,12 @@ const REPOS = [
   { id: 'vaadin/flow', label: 'flow', cssVar: '--series-flow' },
 ];
 
-const WORKFLOW_LABELS = { 'code-review': 'Code review', claude: 'Claude Code' };
-const WORKFLOW_OPTIONS = { 'code-review': 'Code review', claude: 'Claude Code (comments)' };
+const WORKFLOW_LABELS = { 'code-review': 'Code review', claude: 'Claude Code', 'pr-presentation': 'PR presentation' };
+const WORKFLOW_OPTIONS = {
+  'code-review': 'Code review',
+  claude: 'Claude Code (comments)',
+  'pr-presentation': 'PR presentation',
+};
 
 const state = { repo: '', workflow: '', range: '30', granularity: 'week' };
 let allRecords = [];

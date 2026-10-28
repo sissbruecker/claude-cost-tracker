@@ -1,7 +1,8 @@
 # Claude Cost Tracker
 
 Collects and visualizes the costs of Claude Code GitHub workflow runs (code
-reviews and comment-triggered runs) across Vaadin repositories.
+reviews, comment-triggered runs, and PR presentations) across Vaadin
+repositories.
 
 **Dashboard:** served via GitHub Pages from [`docs/`](docs/) — total, average,
 median, and p90 cost per run, weekly or monthly, filterable per repository.
@@ -13,8 +14,8 @@ median, and p90 cost per run, weekly or monthly, filterable per repository.
   of each run, and extracts the cost:
   - `"total_cost_usd": 1.234` — the result JSON logged by `claude-code-action`
     (exact value)
-  - `... ($1.23).` — the summary line logged by the code-review workflow
-    (rounded to cents)
+  - `... ($1.23).` — the summary line logged by the code-review and
+    pr-presentation workflows (rounded to cents)
 - Records are stored as NDJSON files in [`docs/data/`](docs/data/), one file per
   repository, committed to this repo. Git is the database — volume is a few
   hundred records per month.
@@ -66,7 +67,7 @@ One JSON object per line in `docs/data/<owner>-<repo>.ndjson`:
 | Field | Description |
 | --- | --- |
 | `run_id`, `url`, `created_at`, `event`, `conclusion` | Workflow run metadata |
-| `repo`, `workflow` | Source repo and workflow (`code-review` / `claude`) |
+| `repo`, `workflow` | Source repo and workflow (`code-review` / `claude` / `pr-presentation`) |
 | `actor`, `pr`, `title` | Who/what triggered the run |
 | `duration_s` | Duration of the Claude job |
 | `cost_usd` | Extracted cost |
