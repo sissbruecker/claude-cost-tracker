@@ -71,4 +71,3 @@ One JSON object per line in `docs/data/<owner>-<repo>.ndjson`:
 | `duration_s` | Duration of the Claude job |
 | `cost_usd` | Extracted cost |
 | `precise` | `true` if from `total_cost_usd`, `false` if from the rounded summary line |
-| `num_turns` | Number of agent turns, when present in the log |

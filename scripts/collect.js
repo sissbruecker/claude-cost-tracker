@@ -99,7 +99,6 @@ async function* listRuns(repo, workflow, sinceIso) {
 
 const COST_JSON_RE = /"total_cost_usd":\s*([0-9]+(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?)/;
 const COST_SUMMARY_RE = /\(\$([0-9]+(?:\.[0-9]+)?)\)/g;
-const NUM_TURNS_RE = /"num_turns":\s*([0-9]+)/;
 
 function parseCost(log) {
   const json = log.match(COST_JSON_RE);
@@ -126,7 +125,6 @@ async function collectRun(repo, workflowFile, run) {
     if (!log) continue;
     const parsed = parseCost(log);
     if (!parsed) continue;
-    const turns = log.match(NUM_TURNS_RE);
     return {
       run_id: run.id,
       repo,
@@ -141,7 +139,6 @@ async function collectRun(repo, workflowFile, run) {
       duration_s: Math.round((new Date(job.completed_at) - new Date(job.started_at)) / 1000),
       cost_usd: parsed.cost,
       precise: parsed.precise,
-      num_turns: turns ? Number(turns[1]) : null,
     };
   }
   return null;
