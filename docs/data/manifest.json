@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-11-18T14:12:38.285Z",
+  "generated_at": "2026-11-19T14:29:34.392Z",
   "repos": [
     {
       "repo": "vaadin/flow-components",
       "file": "vaadin-flow-components.ndjson",
-      "records": 385,
+      "records": 389,
       "from": "2026-07-10T08:34:46Z",
-      "to": "2026-11-18T13:23:51Z"
+      "to": "2026-11-19T11:30:46Z"
     },
     {
       "repo": "vaadin/web-components",
@@ -18,9 +18,9 @@
     {
       "repo": "vaadin/flow",
       "file": "vaadin-flow.ndjson",
-      "records": 449,
+      "records": 453,
       "from": "2026-08-04T04:53:34Z",
-      "to": "2026-11-18T13:27:01Z"
+      "to": "2026-11-18T16:07:18Z"
     }
   ]
 }
